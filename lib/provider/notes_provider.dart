@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:intermediate_flutter_itbox/models/Note.dart';
-import 'package:intermediate_flutter_itbox/screen/add_notes_screen.dart';
-import 'package:intermediate_flutter_itbox/widgets/notes_grid.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+import '../models/Note.dart';
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<Note> _listNotes = [
-    Note(
+class NotesProvider with ChangeNotifier{
+   List<Note> _notes =[
+     Note(
       id: 'N1',
       title: 'Catatan Materi Flutter',
       note:
@@ -43,41 +35,25 @@ class _HomeScreenState extends State<HomeScreen> {
       updated_at: DateTime.parse('2021-05-20 21:51:33'),
       created_at: DateTime.parse('2021-05-20 21:51:33'),
     ),
-  ];
+   ];
 
-  //function untuk menge pinned note yang di pilih sesuai id
-  void toggleIsPinned(String id) {
-    //variabel index, mengecek apakah id dari note model sama dengan id parameter function ini
-    int index = _listNotes.indexWhere((note) => note.id == id);
-    //mengecek karena menggunakan indexwhere pasti akan return -1 untuk id, maka diperlukan pengecekan menggunakan if index >= 0
-    if (index >= 0) {
-      setState(() {
-        _listNotes[index].isPinned = !_listNotes[index].isPinned;
-      });
+    List<Note> get notes{
+      List<Note> tempListNote = _notes.where((note) => note.isPinned).toList();
+      tempListNote.addAll(_notes.where((note) => !note.isPinned).toList());
+      return tempListNote;
     }
-  }
 
-  void addNote(Note note) {
-    setState(() {
-      _listNotes.add(note);
-    });
-  }
+    void toggleIsPinned(String id){
+      int index = _notes.indexWhere((note) => note.id == id);
+      if (index >= 0) {
+          _notes[index].isPinned = !_notes[index].isPinned; 
+      }
+      notifyListeners();
+      
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('App Notes'),
-      ),
-      body: NotesGrid(_listNotes, toggleIsPinned),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => AddNotesScreen(addNote),
-          ));
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
+    void addNote(Note note){
+      _notes.add(note);
+      notifyListeners();
+    }
 }

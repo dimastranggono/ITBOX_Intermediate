@@ -6,6 +6,11 @@ import 'package:intermediate_flutter_itbox/models/Note.dart';
 
 class AddNotesScreen extends StatefulWidget {
 
+  
+  final Function (Note note) addNoteFunc;
+
+  AddNotesScreen(this.addNoteFunc);
+
   @override
   State<AddNotesScreen> createState() => _AddNotesScreenState();
 }
@@ -17,8 +22,15 @@ class _AddNotesScreenState extends State<AddNotesScreen> {
 
   void submitNote(){
     _keyForm.currentState.save();
-    print(_note.title);
-    print(_note.note);
+   final now = DateTime.now();
+    //Menammbahkan created at dan updated at menggunakan object _note dari Note menggunakan copywith agar pembuatan lebih cepat untuk beberapa variabel
+    _note = _note.copywith(created_at: now,updated_at: now);
+    widget.addNoteFunc(_note); 
+    //untuk menutup halaman add_note_screen
+    Navigator.of(context).pop();
+   //untuk cek apakah data yang ditambah masuk
+    // print(_note.title);
+    // print(_note.note);
   }
   
   @override
